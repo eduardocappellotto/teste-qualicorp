@@ -3,23 +3,20 @@
   <div class="search-container">
     <div class="u-flex u-flexWrap justify-center">
      <img :src="medicineLogo" alt="Desenho de um médico e uma médica">
-    <SearchFilters @search="onSearch"/>
+    <Filters @search="onSearch"/>
     </div>
-    <SearchResults v-if="planosList && planosList.total" :planosList="planosList"/>
   </div>
 </div>
 </template>
 
 <script>
-import SearchFilters from '@/components/SearchFilters.vue';
-import SearchResults from '@/components/SearchResults.vue';
+import Filters from '@/components/Filters.vue';
 import medicine from '../assets/medicine.svg';
 
 export default {
   name: 'Home',
   components: {
-    SearchFilters,
-    SearchResults,
+    Filters,
   },
 
   data() {
@@ -37,6 +34,7 @@ export default {
   methods: {
     onSearch(value) {
       this.planosList = value;
+      this.$router.push({ name: 'Results', params: { planosList: this.planosList } });
     },
   },
 };
