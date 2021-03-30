@@ -1,5 +1,6 @@
 <template>
   <div class="search-filter">
+    <Loading v-if="isLoading" :active="isLoading"/>
     <div class="search-header">
       <h1>Comece aqui</h1>
       <p>
@@ -52,8 +53,8 @@
         <div v-if="selectedCity" class="input-select align-itens-center field">
           <i class="fas fa-suitcase"></i>
           <select
-            id="entidade"
-            name="entidade"
+            id="profissao"
+            name="profissao"
             aria-placeholder="Selecione uma profissão"
             :disabled="isLoading"
             @change="handleSelectProfissao"
@@ -88,7 +89,7 @@
           </select>
         </div>
         <div v-if="selectedEntity" class="input-date field u-flexWrap">
-          <label for="date">Data de Nascimento</label>
+          <label for="date">Data de nascimento</label>
           <input
             :disabled="isLoading"
             type="date"
@@ -104,7 +105,6 @@
             Limpar busca
           </button>
           <button type="submit" form="search-filter">Buscar resultados</button>
-          <i v-if="isLoading" class="u-block fas fa-spinner fa-pulse"></i>
         </div>
       </fieldset>
     </form>
@@ -113,9 +113,13 @@
 
 <script>
 import services from '../services/services';
+import Loading from './Loading.vue';
 
 export default {
-  name: 'SearchFilters',
+  name: 'Filters',
+  components: {
+    Loading,
+  },
   data() {
     return {
       isLoading: false,
@@ -154,7 +158,9 @@ export default {
       this.birthDate = '';
       this.stateList = await services.getStates();
       this.planoList = [];
-      this.$emit('search', this.planoList);
+      // eslint-disable-next-line prefer-destructuring
+      this.selectedState = this.stateList[0];
+      this.cityList = await services.getCities(this.selectedState);
       this.isLoading = false;
     },
     async handleSubmitForm() {
@@ -183,19 +189,22 @@ export default {
         this.isLoading = false;
         return;
       }
-      this.isLoading = false;
       this.$emit('search', this.planoList);
+      this.isLoading = false;
     },
     async handleSelectEstado(estado) {
+      this.isLoading = true;
       this.selectedCity = '';
       this.selectedState = '';
       this.selectedJob = '';
       this.selectedEntity = '';
       this.planoList = [];
-      this.cityList = await services.getCitys(estado.target.value);
+      this.cityList = await services.getCities(estado.target.value);
       this.selectedState = estado.target.value;
+      this.isLoading = false;
     },
     async handleSelectCidade(cidade) {
+      this.isLoading = true;
       this.selectedCity = cidade.target.value;
       const data = [];
       data.estado = this.selectedState;
@@ -205,6 +214,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
+      this.isLoading = false;
     },
     async handleSelectProfissao(profissao) {
       this.isLoading = true;
@@ -222,13 +232,14 @@ export default {
           },
         });
         this.selectedJob = '';
+        this.isLoading = false;
       }
       this.isLoading = false;
     },
-    async handleSelectEntity(entity) {
+    handleSelectEntity(entity) {
       this.selectedEntity = entity.target.value;
     },
-    async handleSelectBirthDate(date) {
+    handleSelectBirthDate(date) {
       this.birthDate = date.target.value;
     },
   },
@@ -264,11 +275,24 @@ export default {
       }
 
       &#estado {
-        width: 56px;
+        width: 60px;
+        height: 42px;
+
+        font-size: 18px;
+        font-weight: 500;
       }
 
       &#cidade {
         width: 192px;
+        height: 42px;
+
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      &#profissao, &#entidade {
+        font-size: 18px;
+        font-weight: 500;
       }
     }
 
@@ -276,6 +300,10 @@ export default {
       border: hidden;
       border-radius: 3px;
       text-align: end;
+      width: 145px;
+
+      font-size: 16px;
+      font-weight: bold;
     }
 
     i {
@@ -299,7 +327,7 @@ export default {
 }
 
 .field {
-  padding: 10px;
+  padding: 12px;
   padding-left: 0px;
   max-width: 310px;
 
