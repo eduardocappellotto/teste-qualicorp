@@ -10,7 +10,7 @@ const getStates = async () => {
   return data.estados.map((estado) => estado.sigla);
 };
 
-const getCitys = async (state) => {
+const getCities = async (state) => {
   const response = await fetch('json/brazil.json');
   const data = await response.json();
   const citys = data.estados.filter((estado) => state === estado.sigla);
@@ -71,7 +71,7 @@ const getPlanos = async (data) => {
 
 export default {
   getStates,
-  getCitys,
+  getCities,
   getJobs,
   getEntities,
   getPlanos,
