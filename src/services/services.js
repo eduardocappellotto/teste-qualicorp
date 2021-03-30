@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://lb-aws-1105894158.sa-east-1.elb.amazonaws.com',
+  baseURL: 'https://apisimulador.qualicorp.com.br',
 });
 
 const getStates = async () => {
